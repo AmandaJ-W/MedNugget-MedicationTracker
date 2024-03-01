@@ -14,13 +14,13 @@ public interface PetDao {
     // Get a pet by name
     Pet getPetByName(String name);
 
-    // Create a new pet
-    void createPet(Pet pet);
+    // Add a new pet
+    Pet addPet(Pet newPet);
 
     // Update a pet
-    void updatePet(Pet pet);
+    Pet updatePet(Pet petToUpdate);
 
     // Remove a pet
-    void removePet(int id);
+    int deletePet(int id);
 
 }

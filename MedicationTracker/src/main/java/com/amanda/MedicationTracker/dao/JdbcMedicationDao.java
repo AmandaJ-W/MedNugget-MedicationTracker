@@ -73,17 +73,21 @@ public class JdbcMedicationDao implements MedicationDao{
     @Override
     public Medication addMedication(Medication newMedication) {
         String insertMedicationSql = "INSERT INTO medication (name, dose, frequency, time_of_dose, purpose, want_reminder) values (?,?,?,?,?,?) RETURNING user_id";
-        int generatedMedId = jdbcTemplate.queryForObject(insertMedicationSql,
-                int.class,
-                newMedication.getName(),
-                newMedication.getDose(),
-                newMedication.getFrequency(),
-                newMedication.getTime(),
-                newMedication.getPurpose(),
-                newMedication.isWantReminder());
-
-        newMedication.setMedId(generatedMedId);
-
+        try {
+            int generatedMedId = jdbcTemplate.queryForObject(insertMedicationSql,
+                    int.class,
+                    newMedication.getName(),
+                    newMedication.getDose(),
+                    newMedication.getFrequency(),
+                    newMedication.getTime(),
+                    newMedication.getPurpose(),
+                    newMedication.isWantReminder());
+            newMedication.setMedId(generatedMedId);
+        } catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException e) {
+            throw new DaoException("Data integrity violation", e);
+        }
         return newMedication;
     }
 
@@ -114,7 +118,7 @@ public class JdbcMedicationDao implements MedicationDao{
                     time, updatedMedication.getPurpose(), updatedMedication.isWantReminder(), updatedMedication.getMedId());
 
             if (rowsAffected == 0) {
-                throw new DaoException("Product does not exist in database. Unable to update product.");
+                throw new DaoException("This medication does not exist in database. Unable to update.");
             } else {
                 medicationToUpdate = getMedicationById(updatedMedication.getMedId());
             }
