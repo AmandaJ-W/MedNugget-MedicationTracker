@@ -130,6 +130,27 @@ public class JdbcMedicationDao implements MedicationDao{
         return medicationToUpdate;
     }
 
+    private List<Medication> getMedicationByPetName(String petName) {
+        List<Medication> medicationsByPetName = new ArrayList<>();
+        try {
+        String joinerSql = "SELECT m.* FROM medication m " +
+                "INNER JOIN pet_medication pm ON m.med_id = pm.med_id " +
+                "INNER JOIN pet p ON pm.pet_id = p.pet_id " +
+                "WHERE pet.name = ?";
+
+        SqlRowSet results = jdbcTemplate.queryForRowSet(joinerSql, petName);
+        while (results.next()) {
+            Medication medication = mapRowToMedication(results);
+            medicationsByPetName.add(medication);
+        }
+    }
+        catch (CannotGetJdbcConnectionException e) {
+        throw new DaoException("Unable to connect to server or database", e);
+    }
+        return medicationsByPetName;
+    }
+
+
     private Medication mapRowToMedication(SqlRowSet rs) {
         Medication medication = new Medication();
         medication.setMedId(rs.getInt("med_id"));

@@ -4,10 +4,14 @@ package com.amanda.MedicationTracker.service;
 import com.amanda.MedicationTracker.dao.PetDao;
 import com.amanda.MedicationTracker.exception.DaoException;
 import com.amanda.MedicationTracker.exception.ServiceException;
+import com.amanda.MedicationTracker.model.Medication;
 import com.amanda.MedicationTracker.model.Pet;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -66,5 +70,6 @@ public class PetService {
             throw new ServiceException("Error. Cannot delete pet.", e);
         }
     }
+
 
 }

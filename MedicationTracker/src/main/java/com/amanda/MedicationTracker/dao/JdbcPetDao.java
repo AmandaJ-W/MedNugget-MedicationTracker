@@ -114,6 +114,25 @@ public class JdbcPetDao implements PetDao {
         return affectedRows;
     }
 
+    // Find associated pets when searching a medication
+    private List<Pet> findPetsByMedicationName(String medName) {
+        List<Pet> petsByMedicationName = new ArrayList<>();
+        try {
+            String joinerSql = "SELECT * FROM pet " +
+                    "INNER JOIN pet_medication ON pet.pet_id = pet_medication.pet_id " +
+                    "INNER JOIN medication ON pet_medication.med_id = medication.med_id " +
+                    "WHERE medication.name = ?";
+            SqlRowSet results = jdbcTemplate.queryForRowSet(joinerSql, medName);
+            while (results.next()) {
+                Pet pet = mapRowToPet(results);
+                petsByMedicationName.add(pet);
+            }
+        } catch (CannotGetJdbcConnectionException e) {
+        throw new DaoException("Unable to connect to server or database", e);
+    }
+        return petsByMedicationName;
+    }
+
     private Pet mapRowToPet(SqlRowSet rs) {
         Pet pet = new Pet();
         pet.setPetId(rs.getInt("pet_id"));
