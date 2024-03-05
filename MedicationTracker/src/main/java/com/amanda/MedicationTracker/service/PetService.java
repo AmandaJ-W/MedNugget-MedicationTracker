@@ -71,5 +71,12 @@ public class PetService {
         }
     }
 
+    public List<Pet> findPetsByMedicationName(String medName) {
+        try {
+            return petDao.findPetsByMedicationName(medName);
+        }catch (DaoException e) {
+            throw new ServiceException("Error. Cannot find pets.", e);
+        }
+    }
 
 }

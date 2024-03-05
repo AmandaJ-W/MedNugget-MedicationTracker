@@ -19,4 +19,5 @@ public interface MedicationDao {
 
     // Update medication
     Medication updateMedication(Medication medication);
+    List<Medication> getMedicationByPetName(String petName);
 }

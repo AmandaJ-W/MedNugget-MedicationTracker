@@ -130,7 +130,7 @@ public class JdbcMedicationDao implements MedicationDao{
         return medicationToUpdate;
     }
 
-    private List<Medication> getMedicationByPetName(String petName) {
+    public List<Medication> getMedicationByPetName(String petName) {
         List<Medication> medicationsByPetName = new ArrayList<>();
         try {
         String joinerSql = "SELECT m.* FROM medication m " +

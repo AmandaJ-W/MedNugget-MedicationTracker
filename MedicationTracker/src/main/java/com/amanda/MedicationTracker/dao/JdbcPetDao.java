@@ -115,7 +115,7 @@ public class JdbcPetDao implements PetDao {
     }
 
     // Find associated pets when searching a medication
-    private List<Pet> findPetsByMedicationName(String medName) {
+    public List<Pet> findPetsByMedicationName(String medName) {
         List<Pet> petsByMedicationName = new ArrayList<>();
         try {
             String joinerSql = "SELECT * FROM pet " +

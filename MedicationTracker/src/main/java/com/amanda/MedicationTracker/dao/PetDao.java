@@ -23,4 +23,5 @@ public interface PetDao {
     // Remove a pet
     int deletePet(int id);
 
+    public List<Pet> findPetsByMedicationName(String medName);
 }
