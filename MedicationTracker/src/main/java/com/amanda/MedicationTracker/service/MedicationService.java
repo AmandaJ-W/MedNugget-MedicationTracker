@@ -6,9 +6,11 @@ import com.amanda.MedicationTracker.exception.DaoException;
 import com.amanda.MedicationTracker.exception.ServiceException;
 import com.amanda.MedicationTracker.model.Medication;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class MedicationService {
 
     private final MedicationDao medicationDao;

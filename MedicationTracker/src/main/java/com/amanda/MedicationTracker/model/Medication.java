@@ -1,5 +1,7 @@
 package com.amanda.MedicationTracker.model;
 
+import org.springframework.cglib.core.Local;
+
 import java.time.LocalTime;
 
 public class Medication {
@@ -12,6 +14,16 @@ public class Medication {
 
     private String purpose;
     private boolean wantReminder;
+    private boolean given;
+    private LocalTime givenTime;
+
+    public LocalTime getGivenTime() {
+        return givenTime;
+    }
+
+    public void setGivenTime(LocalTime givenTime) {
+        this.givenTime = givenTime;
+    }
 
     public Medication() {
     }
@@ -24,7 +36,15 @@ public class Medication {
         this.medId = medId;
     }
 
-    public Medication(int medId, String name, String dose, String frequency, LocalTime time, String purpose, boolean wantReminder) {
+    public boolean isGiven() {
+        return given;
+    }
+
+    public void setGiven(boolean given) {
+        this.given = given;
+    }
+
+    public Medication(int medId, String name, String dose, String frequency, LocalTime time, String purpose, boolean wantReminder, boolean given) {
         this.medId = medId;
         this.name = name;
         this.dose = dose;
@@ -32,6 +52,7 @@ public class Medication {
         this.time = time;
         this.purpose = purpose;
         this.wantReminder = wantReminder;
+        this.given = given;
     }
 
     public String getName() {

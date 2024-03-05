@@ -1,17 +1,21 @@
 package com.amanda.MedicationTracker.dao;
 
 import com.amanda.MedicationTracker.exception.DaoException;
+import com.amanda.MedicationTracker.exception.NotFoundException;
 import com.amanda.MedicationTracker.model.Medication;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.stereotype.Repository;
 
 import java.sql.Time;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 public class JdbcMedicationDao implements MedicationDao{
 
     private final JdbcTemplate jdbcTemplate;
@@ -72,7 +76,7 @@ public class JdbcMedicationDao implements MedicationDao{
 
     @Override
     public Medication addMedication(Medication newMedication) {
-        String insertMedicationSql = "INSERT INTO medication (name, dose, frequency, time_of_dose, purpose, want_reminder) values (?,?,?,?,?,?) RETURNING user_id";
+        String insertMedicationSql = "INSERT INTO medication (name, dose, frequency, time_of_dose, purpose, want_reminder, given) values (?,?,?,?,?,?,?) RETURNING med_id";
         try {
             int generatedMedId = jdbcTemplate.queryForObject(insertMedicationSql,
                     int.class,
@@ -81,8 +85,8 @@ public class JdbcMedicationDao implements MedicationDao{
                     newMedication.getFrequency(),
                     newMedication.getTime(),
                     newMedication.getPurpose(),
-                    newMedication.isWantReminder());
-            newMedication.setMedId(generatedMedId);
+                    newMedication.isWantReminder(), false);
+                    newMedication.setMedId(generatedMedId);
         } catch (CannotGetJdbcConnectionException e) {
             throw new DaoException("Unable to connect to server or database", e);
         } catch (DataIntegrityViolationException e) {
@@ -130,6 +134,7 @@ public class JdbcMedicationDao implements MedicationDao{
         return medicationToUpdate;
     }
 
+    @Override
     public List<Medication> getMedicationByPetName(String petName) {
         List<Medication> medicationsByPetName = new ArrayList<>();
         try {
@@ -150,6 +155,29 @@ public class JdbcMedicationDao implements MedicationDao{
         return medicationsByPetName;
     }
 
+    @Override
+    public Medication markDoseAsGiven(int id, LocalTime time) {
+        Medication medicationToUpdate = getMedicationById(id);
+        if (medicationToUpdate == null) {
+            throw new NotFoundException("Error. Cannot find medication.");
+        }
+
+        medicationToUpdate.setGiven(true);
+        medicationToUpdate.setGivenTime(time);
+
+        String sql = "UPDATE medication SET given=? WHERE med_id = ?;";
+        try {
+            int rowsAffected = jdbcTemplate.update(sql, medicationToUpdate.isGiven(), medicationToUpdate.getGivenTime(), medicationToUpdate.getMedId());
+            if (rowsAffected == 0) {
+                throw new DaoException("Failed to mark dose as given.");
+            }
+        } catch (CannotGetJdbcConnectionException e) {
+            throw new DaoException("Unable to connect to server or database", e);
+        } catch (DataIntegrityViolationException e) {
+            throw new DaoException("Data integrity violation", e);
+        }
+        return medicationToUpdate;
+    }
 
     private Medication mapRowToMedication(SqlRowSet rs) {
         Medication medication = new Medication();
@@ -157,7 +185,7 @@ public class JdbcMedicationDao implements MedicationDao{
         medication.setName(rs.getString("name"));
         medication.setDose(rs.getString("dose"));
         medication.setFrequency(rs.getString("frequency"));
-        medication.setTime(getLocalTime(rs, "time"));
+        medication.setTime(getLocalTime(rs, "time_of_dose"));
         medication.setPurpose(rs.getString("purpose"));
         medication.setWantReminder(rs.getBoolean("want_reminder"));
         return medication;
