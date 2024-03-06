@@ -42,7 +42,7 @@ public class JdbcPetDao implements PetDao {
         Pet pet = null;
         String sql = "SELECT * FROM pet WHERE pet_id = ?;";
         try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, id);
             if (results.next()) {
                 pet = mapRowToPet(results);
             }
@@ -69,10 +69,9 @@ public class JdbcPetDao implements PetDao {
 
     @Override
     public Pet addPet(Pet newPet) {
-        String sql = "INSERT INTO pet (name, type_of_animal) value (?, ?) RETURNING pet_id;";
+        String sql = "INSERT INTO pet (name, type_of_animal) values (?, ?) RETURNING pet_id;";
         try {
-            int generatedPetId = jdbcTemplate.queryForObject(sql, int.class, newPet.getName(), newPet.getTypeOfAnimal(),
-                    newPet.getPetId());
+            int generatedPetId = jdbcTemplate.queryForObject(sql, int.class, newPet.getName(), newPet.getTypeOfAnimal());
             newPet.setPetId(generatedPetId);
         } catch (CannotGetJdbcConnectionException e) {
             throw new DaoException("Unable to connect to server or database", e);

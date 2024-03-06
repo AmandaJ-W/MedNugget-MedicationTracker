@@ -23,27 +23,29 @@ public class MedicationController {
         return medicationService.listAllMedications();
     }
 
-    @GetMapping("/{id}")
-    public Medication getMedicationById(@PathVariable int id) {
-        return medicationService.getMedicationById(id);
+    @GetMapping("/{medId}")
+    public Medication getMedicationById(@PathVariable int medId) {
+        return medicationService.getMedicationById(medId);
     }
 
-    @PostMapping("/add")
+    @PostMapping("/addMedication")
     public Medication addMedication(@RequestBody Medication medication) {
         return medicationService.addMedication(medication);
     }
 
-    @PutMapping("/{id}")
-    public Medication updateMedication(@PathVariable int id, @RequestBody Medication updatedMedication) {
-        updatedMedication.setMedId(id);
+    @PutMapping("/{medId}")
+    public Medication updateMedication(@PathVariable int medId, @RequestBody Medication updatedMedication) {
+        updatedMedication.setMedId(medId);
         return medicationService.updateMedication(updatedMedication);
     }
 
 
-    @DeleteMapping("/{id}")
-    public int deleteMedication(@PathVariable int id) {
-        return medicationService.deleteMedication(id);
+    @DeleteMapping("/{medId}")
+    public int deleteMedication(@PathVariable int medId) {
+        return medicationService.deleteMedication(medId);
     }
+
+    // MISSING SERVICE METHODS
 
     // Endpoint to get medications by day (frequency)
 //    @GetMapping("/byDay")

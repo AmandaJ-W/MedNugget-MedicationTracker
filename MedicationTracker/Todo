@@ -1,4 +1,17 @@
 1) A schedule - you need a way to display all medications and their scheduled doses.
 2) Find next dose based on a date.
 3) A way to mark a dose as given and specify the time it was given.
-4) time is problematic for medications given multiple times a day; consider time between doses and a method to calculate that.
+4) Time is problematic for medications given multiple times a day; consider time between doses and a method to calculate that.
+5) Create a way to remind user to give a dose.
+
+View schedule:
+
+Monday:
+1) Medication: (info)
+2) Medication 2: (info)
+Tuesday
+Wednesday
+Thursday
+Friday
+Saturday
+Sunday
