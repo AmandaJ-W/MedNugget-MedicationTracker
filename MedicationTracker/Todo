@@ -1,3 +1,14 @@
+
+SUPER IMPORTANT:
+YOU NEED A METHOD TO ASSOCIATE THE PET WITH THE MEDICATION
+
+
+ associatePetWithMedication(petId, medId);
+
+ FIRST CHECK THAT THE MEDICINE has an existing med id
+ ... or that the pet has an existing pet id
+
+
 1) A schedule - you need a way to display all medications and their scheduled doses.
 2) Find next dose based on a date.
 3) A way to mark a dose as given and specify the time it was given.

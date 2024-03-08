@@ -2,7 +2,6 @@ package com.amanda.MedicationTracker.controller;
 
 import com.amanda.MedicationTracker.model.Medication;
 import com.amanda.MedicationTracker.model.Pet;
-import com.amanda.MedicationTracker.service.MedicationService;
 import com.amanda.MedicationTracker.service.PetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -46,5 +45,9 @@ public class PetController {
         return petService.deletePet(petId);
     }
 
-    // MISSING SERVICE METHODS
+    @GetMapping("/petsByMedName")
+    public List<Pet> findPetsByMedicationName(@RequestParam String medName){
+        return petService.findPetsByMedicationName(medName);
+    }
+
 }

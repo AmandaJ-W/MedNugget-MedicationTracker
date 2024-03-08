@@ -53,4 +53,7 @@ public class MedicationController {
 //        return medicationService.getMedicationByDay(day);
 //    }
 
+    // public List<Medication> getMedicationByPetName(String petName)
+
+
 }

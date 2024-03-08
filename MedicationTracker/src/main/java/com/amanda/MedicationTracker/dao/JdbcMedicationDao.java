@@ -76,16 +76,11 @@ public class JdbcMedicationDao implements MedicationDao{
 
     @Override
     public Medication addMedication(Medication newMedication) {
-        String insertMedicationSql = "INSERT INTO medication (name, dose, frequency, time_of_dose, purpose, want_reminder, given) values (?,?,?,?,?,?,?) RETURNING med_id";
+        String insertMedicationSql = "INSERT INTO medication (name) values (?) RETURNING med_id";
         try {
             int generatedMedId = jdbcTemplate.queryForObject(insertMedicationSql,
                     int.class,
-                    newMedication.getName(),
-                    newMedication.getDose(),
-                    newMedication.getFrequency(),
-                    newMedication.getTime(),
-                    newMedication.getPurpose(),
-                    newMedication.isWantReminder(), false);
+                    newMedication.getName());
                     newMedication.setMedId(generatedMedId);
         } catch (CannotGetJdbcConnectionException e) {
             throw new DaoException("Unable to connect to server or database", e);
@@ -114,15 +109,12 @@ public class JdbcMedicationDao implements MedicationDao{
     @Override
     public Medication updateMedication(Medication updatedMedication) {
         Medication medicationToUpdate = null;
-        String sql = "UPDATE medication SET name=?, dose=?, frequency=?, time=?, purpose=?, wantReminder=? WHERE med_id = ?;";
+        String sql = "UPDATE medication SET name=? WHERE med_id = ?;";
         try {
-
-            Time time = updatedMedication.getTime() != null ? Time.valueOf(updatedMedication.getTime()) : null;
-            int rowsAffected = jdbcTemplate.update(sql, updatedMedication.getName(), updatedMedication.getDose(), updatedMedication.getFrequency(),
-                    time, updatedMedication.getPurpose(), updatedMedication.isWantReminder(), updatedMedication.getMedId());
+            int rowsAffected = jdbcTemplate.update(sql, updatedMedication.getName(), updatedMedication.getMedId());
 
             if (rowsAffected == 0) {
-                throw new DaoException("This medication does not exist in database. Unable to update.");
+                throw new DaoException("This medication does not exist in the database. Unable to update.");
             } else {
                 medicationToUpdate = getMedicationById(updatedMedication.getMedId());
             }
@@ -133,6 +125,7 @@ public class JdbcMedicationDao implements MedicationDao{
         }
         return medicationToUpdate;
     }
+
 
     @Override
     public List<Medication> getMedicationByPetName(String petName) {
@@ -155,45 +148,40 @@ public class JdbcMedicationDao implements MedicationDao{
         return medicationsByPetName;
     }
 
-    @Override
-    public Medication markDoseAsGiven(int id, LocalTime time) {
-        Medication medicationToUpdate = getMedicationById(id);
-        if (medicationToUpdate == null) {
-            throw new NotFoundException("Error. Cannot find medication.");
-        }
-
-        medicationToUpdate.setGiven(true);
-        medicationToUpdate.setGivenTime(time);
-
-        String sql = "UPDATE medication SET given=? WHERE med_id = ?;";
-        try {
-            int rowsAffected = jdbcTemplate.update(sql, medicationToUpdate.isGiven(), medicationToUpdate.getGivenTime(), medicationToUpdate.getMedId());
-            if (rowsAffected == 0) {
-                throw new DaoException("Failed to mark dose as given.");
-            }
-        } catch (CannotGetJdbcConnectionException e) {
-            throw new DaoException("Unable to connect to server or database", e);
-        } catch (DataIntegrityViolationException e) {
-            throw new DaoException("Data integrity violation", e);
-        }
-        return medicationToUpdate;
-    }
+//    @Override
+//    public Medication markDoseAsGiven(int id, LocalTime time) {
+//        Medication medicationToUpdate = getMedicationById(id);
+//        if (medicationToUpdate == null) {
+//            throw new NotFoundException("Error. Cannot find medication.");
+//        }
+//
+//        medicationToUpdate.setGiven(true);
+//        medicationToUpdate.setGivenTime(time);
+//
+//        String sql = "UPDATE medication SET given=? WHERE med_id = ?;";
+//        try {
+//            int rowsAffected = jdbcTemplate.update(sql, medicationToUpdate.isGiven(), medicationToUpdate.getGivenTime(), medicationToUpdate.getMedId());
+//            if (rowsAffected == 0) {
+//                throw new DaoException("Failed to mark dose as given.");
+//            }
+//        } catch (CannotGetJdbcConnectionException e) {
+//            throw new DaoException("Unable to connect to server or database", e);
+//        } catch (DataIntegrityViolationException e) {
+//            throw new DaoException("Data integrity violation", e);
+//        }
+//        return medicationToUpdate;
+//    }
 
     private Medication mapRowToMedication(SqlRowSet rs) {
         Medication medication = new Medication();
         medication.setMedId(rs.getInt("med_id"));
         medication.setName(rs.getString("name"));
-        medication.setDose(rs.getString("dose"));
-        medication.setFrequency(rs.getString("frequency"));
-        medication.setTime(getLocalTime(rs, "time_of_dose"));
-        medication.setPurpose(rs.getString("purpose"));
-        medication.setWantReminder(rs.getBoolean("want_reminder"));
         return medication;
     }
 
-    // This is for converting to LocalTime datatype
-    private LocalTime getLocalTime(SqlRowSet rs, String columnName) {
-        Time time = rs.getTime(columnName);
-        return time != null ? time.toLocalTime() : null;
-    }
+//    This is for converting to LocalTime datatype
+//    private LocalTime getLocalTime(SqlRowSet rs, String columnName) {
+//        Time time = rs.getTime(columnName);
+//        return time != null ? time.toLocalTime() : null;
+//    }
 }
