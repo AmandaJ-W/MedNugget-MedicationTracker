@@ -35,18 +35,27 @@ public class MedicationController {
         return medicationService.addMedication(medication);
     }
 
-    @PutMapping("/{medId}")
+    @PutMapping("/update/{medId}")
     public Medication updateMedication(@PathVariable int medId, @RequestBody Medication updatedMedication) {
         updatedMedication.setMedId(medId);
         return medicationService.updateMedication(updatedMedication);
     }
 
 
-    @DeleteMapping("/{medId}")
+    @DeleteMapping("/delete/{medId}")
     public int deleteMedication(@PathVariable int medId) {
         return medicationService.deleteMedication(medId);
     }
 
+    @GetMapping("/getmedicationbyname")
+    public List<Medication> getMedicationByName(@RequestParam String name) {
+        return medicationService.getMedicationByName(name);
+    }
+
+    @GetMapping("/getmedicationbypetname")
+    public List<Medication> getMedicationByPetName(@RequestParam String petName) {
+        return medicationService.getMedicationByPetName(petName);
+    }
 
 
 }

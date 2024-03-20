@@ -34,13 +34,13 @@ public class PetController {
         return petService.addPet(pet);
     }
 
-    @PutMapping("/{petId}")
+    @PutMapping("/update/{petId}")
     public Pet updatePet(@PathVariable int petId, @RequestBody Pet updatedPet) {
         updatedPet.setPetId(petId);
         return petService.updatePet(updatedPet);
     }
 
-    @DeleteMapping("/{petId}")
+    @DeleteMapping("/delete/{petId}")
     public int deletePet(@PathVariable int petId) {
         return petService.deletePet(petId);
     }

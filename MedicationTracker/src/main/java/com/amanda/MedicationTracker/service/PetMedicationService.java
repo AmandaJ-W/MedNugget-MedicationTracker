@@ -4,6 +4,7 @@ import com.amanda.MedicationTracker.dao.MedicationDao;
 import com.amanda.MedicationTracker.dao.PetMedicationDao;
 import com.amanda.MedicationTracker.exception.DaoException;
 import com.amanda.MedicationTracker.exception.ServiceException;
+import com.amanda.MedicationTracker.model.PetMedication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,11 +18,20 @@ public class PetMedicationService {
         this.petMedicationDao = petMedicationDao;
     }
 
-    public void assignMedicationToPet(int medId, int petId) {
+    public void assignMedicationToPet(PetMedication petMedication) {
         try {
-            petMedicationDao.assignMedicationToPet(medId, petId);
+            petMedicationDao.assignMedicationToPet(
+                    petMedication.getMedId(),
+                    petMedication.getPetId(),
+                    petMedication.getDose(),
+                    petMedication.getFrequency(),
+                    petMedication.getPurpose(),
+                    petMedication.isWantReminder(),
+                    petMedication.isGiven()
+            );
         } catch (DaoException e) {
-            throw new ServiceException("Error. Something has gone wrong.", e);
+            throw new ServiceException("Error assigning medication to pet.", e);
         }
     }
+
 }

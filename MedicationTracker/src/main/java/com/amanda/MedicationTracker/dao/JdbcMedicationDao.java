@@ -46,7 +46,7 @@ public class JdbcMedicationDao implements MedicationDao{
         Medication medication = null;
         String sql = "SELECT * FROM medication WHERE med_id = ?;";
         try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, medId);
             if (results.next()) {
                 medication = mapRowToMedication(results);
             }
@@ -74,7 +74,7 @@ public class JdbcMedicationDao implements MedicationDao{
         return medicationsByNameList;
     }
 
-    //not working
+
     @Override
     public Medication addMedication(Medication newMedication) {
         String insertMedicationSql = "INSERT INTO medication (name) VALUES (?) RETURNING med_id";
@@ -176,10 +176,10 @@ public class JdbcMedicationDao implements MedicationDao{
     public List<Medication> getMedicationByPetName(String petName) {
         List<Medication> medicationsByPetName = new ArrayList<>();
         try {
-        String joinerSql = "SELECT m.* FROM medication m " +
-                "INNER JOIN pet_medication pm ON m.med_id = pm.med_id " +
-                "INNER JOIN pet p ON pm.pet_id = p.pet_id " +
-                "WHERE pet.name = ?";
+        String joinerSql = "SELECT * FROM medication " +
+                "INNER JOIN pet_medication ON medication.med_id = pet_medication.med_id " +
+                "INNER JOIN pet ON pet_medication.pet_id = pet.pet_id " +
+                "WHERE pet.name = ?;";
 
         SqlRowSet results = jdbcTemplate.queryForRowSet(joinerSql, petName);
         while (results.next()) {

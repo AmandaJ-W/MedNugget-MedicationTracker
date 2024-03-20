@@ -67,11 +67,12 @@ public class MedicationService {
         }
     }
 
+
     public List<Medication> getMedicationByPetName(String petName) {
         try {
             return medicationDao.getMedicationByPetName(petName);
         } catch (DaoException e) {
-            throw new ServiceException("Error. Cannot update medication.", e);
+            throw new ServiceException("Error. Cannot find medication.", e);
         }
     }
 
