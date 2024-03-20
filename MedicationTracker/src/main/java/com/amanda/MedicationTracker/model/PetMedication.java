@@ -18,6 +18,25 @@ public class PetMedication {
         this.given = given;
     }
 
+    public int getMedId() {
+        return medId;
+    }
+
+    public void setMedId(int medId) {
+        this.medId = medId;
+    }
+
+    public PetMedication() {
+    }
+
+    public int getPetId() {
+        return petId;
+    }
+
+    public void setPetId(int petId) {
+        this.petId = petId;
+    }
+
     public String getDose() {
         return dose;
     }

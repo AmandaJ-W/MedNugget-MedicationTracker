@@ -1,17 +1,17 @@
 package com.amanda.MedicationTracker.dao;
 
 import com.amanda.MedicationTracker.exception.DaoException;
-import com.amanda.MedicationTracker.exception.NotFoundException;
 import com.amanda.MedicationTracker.model.Medication;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Time;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,20 +74,65 @@ public class JdbcMedicationDao implements MedicationDao{
         return medicationsByNameList;
     }
 
+    //not working
     @Override
     public Medication addMedication(Medication newMedication) {
-        String insertMedicationSql = "INSERT INTO medication (name) values (?) RETURNING med_id";
+        String insertMedicationSql = "INSERT INTO medication (name) VALUES (?) RETURNING med_id";
         try {
-            int generatedMedId = jdbcTemplate.queryForObject(insertMedicationSql,
-                    int.class,
-                    newMedication.getName());
-                    newMedication.setMedId(generatedMedId);
+            Integer generatedMedId = jdbcTemplate.queryForObject(
+                    insertMedicationSql,
+                    new Object[]{newMedication.getName()},
+                    Integer.class
+            );
+            if (generatedMedId != null) {
+                newMedication.setMedId(generatedMedId);
+            } else {
+                throw new DaoException("Failed to retrieve generated medication ID");
+            }
         } catch (CannotGetJdbcConnectionException e) {
             throw new DaoException("Unable to connect to server or database", e);
-        } catch (DataIntegrityViolationException e) {
-            throw new DaoException("Data integrity violation", e);
+        } catch (DataAccessException e) {
+            throw new DaoException("Data access exception occurred", e);
         }
         return newMedication;
+    }
+
+
+//    @Override
+//    public void assignMedicationToPet(int medId, int petId) {
+//        // Check if both the medication and the pet exist
+//        if (medicationExists(medId) && petExists(petId)) {
+//            String insertPetMedicationSql = "INSERT INTO pet_medication (pet_id, med_id) VALUES (?, ?)";
+//            try {
+//                jdbcTemplate.update(insertPetMedicationSql, medId, petId);
+//            } catch (CannotGetJdbcConnectionException e) {
+//                throw new DaoException("Error inserting into pet_medication table", e);
+//            }
+//        } else {
+//            // Handle if medication or pet doesn't exist
+//            throw new DaoException("Medication or Pet does not exist.");
+//        }
+//    }
+//
+//    // methods to check that pet and medication exist
+//    private boolean medicationExists(int medId) {
+//        String sql = "SELECT COUNT(*) FROM medication WHERE med_id = ?";
+//        try {
+//            int count = jdbcTemplate.queryForObject(sql, Integer.class, medId);
+//            return count > 0;
+//        } catch (EmptyResultDataAccessException e) {
+//            return false;
+//        }
+//    }
+
+    private boolean petExists(int petId) {
+        String sql = "SELECT COUNT(*) FROM pet WHERE pet_id = ?";
+        try {
+            int count = jdbcTemplate.queryForObject(sql, Integer.class, petId);
+            return count > 0;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
     }
 
     @Override
@@ -148,29 +193,6 @@ public class JdbcMedicationDao implements MedicationDao{
         return medicationsByPetName;
     }
 
-//    @Override
-//    public Medication markDoseAsGiven(int id, LocalTime time) {
-//        Medication medicationToUpdate = getMedicationById(id);
-//        if (medicationToUpdate == null) {
-//            throw new NotFoundException("Error. Cannot find medication.");
-//        }
-//
-//        medicationToUpdate.setGiven(true);
-//        medicationToUpdate.setGivenTime(time);
-//
-//        String sql = "UPDATE medication SET given=? WHERE med_id = ?;";
-//        try {
-//            int rowsAffected = jdbcTemplate.update(sql, medicationToUpdate.isGiven(), medicationToUpdate.getGivenTime(), medicationToUpdate.getMedId());
-//            if (rowsAffected == 0) {
-//                throw new DaoException("Failed to mark dose as given.");
-//            }
-//        } catch (CannotGetJdbcConnectionException e) {
-//            throw new DaoException("Unable to connect to server or database", e);
-//        } catch (DataIntegrityViolationException e) {
-//            throw new DaoException("Data integrity violation", e);
-//        }
-//        return medicationToUpdate;
-//    }
 
     private Medication mapRowToMedication(SqlRowSet rs) {
         Medication medication = new Medication();
@@ -179,9 +201,5 @@ public class JdbcMedicationDao implements MedicationDao{
         return medication;
     }
 
-//    This is for converting to LocalTime datatype
-//    private LocalTime getLocalTime(SqlRowSet rs, String columnName) {
-//        Time time = rs.getTime(columnName);
-//        return time != null ? time.toLocalTime() : null;
-//    }
+
 }

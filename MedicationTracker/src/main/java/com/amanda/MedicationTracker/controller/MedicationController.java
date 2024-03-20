@@ -1,5 +1,7 @@
 package com.amanda.MedicationTracker.controller;
 
+import com.amanda.MedicationTracker.exception.DaoException;
+import com.amanda.MedicationTracker.exception.ServiceException;
 import com.amanda.MedicationTracker.model.Medication;
 import com.amanda.MedicationTracker.service.MedicationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,15 +47,6 @@ public class MedicationController {
         return medicationService.deleteMedication(medId);
     }
 
-    // MISSING SERVICE METHODS
-
-    // Endpoint to get medications by day (frequency)
-//    @GetMapping("/byDay")
-//    public List<Medication> getMedicationsByDay(@RequestParam String day) {
-//        return medicationService.getMedicationByDay(day);
-//    }
-
-    // public List<Medication> getMedicationByPetName(String petName)
 
 
 }

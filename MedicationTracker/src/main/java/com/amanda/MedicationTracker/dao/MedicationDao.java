@@ -1,6 +1,7 @@
 package com.amanda.MedicationTracker.dao;
 
 import com.amanda.MedicationTracker.model.Medication;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -15,6 +16,8 @@ public interface MedicationDao {
     List<Medication> getMedicationByName(String name);
     // Add medication
     Medication addMedication(Medication newMedication);
+
+
     // Remove medication
     int deleteMedication(int medId); // returns num rows
 

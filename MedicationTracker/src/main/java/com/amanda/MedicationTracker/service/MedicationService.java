@@ -1,7 +1,6 @@
 package com.amanda.MedicationTracker.service;
 
 import com.amanda.MedicationTracker.dao.MedicationDao;
-import com.amanda.MedicationTracker.dao.PetDao;
 import com.amanda.MedicationTracker.exception.DaoException;
 import com.amanda.MedicationTracker.exception.ServiceException;
 import com.amanda.MedicationTracker.model.Medication;
@@ -75,7 +74,6 @@ public class MedicationService {
             throw new ServiceException("Error. Cannot update medication.", e);
         }
     }
-
 
 
 
