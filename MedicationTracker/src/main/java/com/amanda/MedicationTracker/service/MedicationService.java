@@ -77,5 +77,12 @@ public class MedicationService {
     }
 
 
+    public void markMedicationAsGiven(int medId, int petId) {
+        try {
+            medicationDao.markMedicationAsGiven(medId, petId);
+        } catch (DaoException e) {
+            throw new ServiceException("Error. Couldn't mark medication dose as given.", e);
+        }
+    }
 
 }

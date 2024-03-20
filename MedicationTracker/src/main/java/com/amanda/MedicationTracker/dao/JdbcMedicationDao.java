@@ -5,8 +5,6 @@ import com.amanda.MedicationTracker.model.Medication;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -97,34 +95,6 @@ public class JdbcMedicationDao implements MedicationDao{
         return newMedication;
     }
 
-
-//    @Override
-//    public void assignMedicationToPet(int medId, int petId) {
-//        // Check if both the medication and the pet exist
-//        if (medicationExists(medId) && petExists(petId)) {
-//            String insertPetMedicationSql = "INSERT INTO pet_medication (pet_id, med_id) VALUES (?, ?)";
-//            try {
-//                jdbcTemplate.update(insertPetMedicationSql, medId, petId);
-//            } catch (CannotGetJdbcConnectionException e) {
-//                throw new DaoException("Error inserting into pet_medication table", e);
-//            }
-//        } else {
-//            // Handle if medication or pet doesn't exist
-//            throw new DaoException("Medication or Pet does not exist.");
-//        }
-//    }
-//
-//    // methods to check that pet and medication exist
-//    private boolean medicationExists(int medId) {
-//        String sql = "SELECT COUNT(*) FROM medication WHERE med_id = ?";
-//        try {
-//            int count = jdbcTemplate.queryForObject(sql, Integer.class, medId);
-//            return count > 0;
-//        } catch (EmptyResultDataAccessException e) {
-//            return false;
-//        }
-//    }
-
     private boolean petExists(int petId) {
         String sql = "SELECT COUNT(*) FROM pet WHERE pet_id = ?";
         try {
@@ -192,6 +162,29 @@ public class JdbcMedicationDao implements MedicationDao{
     }
         return medicationsByPetName;
     }
+
+
+    @Override
+    public void markMedicationAsGiven(int medId, int petId) {
+        // Check if the medication is associated with the specified pet
+        String checkAssociationSql = "SELECT COUNT(*) FROM pet_medication WHERE med_id = ? AND pet_id = ?";
+        int count = jdbcTemplate.queryForObject(checkAssociationSql, Integer.class, medId, petId);
+
+        if (count > 0) {
+            // Medication is associated with the specified pet so update
+            String updateSql = "UPDATE pet_medication SET given = true WHERE med_id = ? AND pet_id = ?";
+            try {
+                jdbcTemplate.update(updateSql, medId, petId);
+            } catch (CannotGetJdbcConnectionException e) {
+                throw new DaoException("Unable to connect to server or database", e);
+            } catch (DataIntegrityViolationException e) {
+                throw new DaoException("Data integrity violation", e);
+            }
+        } else {
+            throw new DaoException("Medication is not associated with the specified pet");
+        }
+    }
+
 
 
     private Medication mapRowToMedication(SqlRowSet rs) {

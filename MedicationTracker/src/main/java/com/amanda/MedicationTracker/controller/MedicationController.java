@@ -57,5 +57,9 @@ public class MedicationController {
         return medicationService.getMedicationByPetName(petName);
     }
 
+    @PutMapping("/givemedication/")
+    public void markMedicationAsGiven(@RequestParam int medId, @RequestParam int petId) {
+        medicationService.markMedicationAsGiven(medId, petId);
+    }
 
 }
