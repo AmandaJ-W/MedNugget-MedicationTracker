@@ -2,11 +2,15 @@ package com.amanda.MedicationTracker.dao;
 
 import com.amanda.MedicationTracker.exception.DaoException;
 import com.amanda.MedicationTracker.model.PetMedication;
+import org.springframework.cglib.core.Local;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+
+import java.sql.Time;
+import java.time.LocalTime;
 
 @Repository
 public class JdbcPetMedicationDao implements PetMedicationDao {
@@ -63,6 +67,13 @@ public class JdbcPetMedicationDao implements PetMedicationDao {
         petMedication.setPurpose(rs.getString("purpose"));
         petMedication.setWantReminder(rs.getBoolean("wantReminder"));
         petMedication.setGiven(rs.getBoolean("given"));
+
+        Time timeValue = rs.getTime("time_of_dose");
+        if(timeValue != null) {
+            LocalTime localTime = timeValue.toLocalTime();
+            petMedication.setTimeGiven(localTime);
+        }
+
         return petMedication;
     }
 

@@ -10,6 +10,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -172,9 +176,12 @@ public class JdbcMedicationDao implements MedicationDao{
 
         if (count > 0) {
             // Medication is associated with the specified pet so update
-            String updateSql = "UPDATE pet_medication SET given = true WHERE med_id = ? AND pet_id = ?";
+            String updateSql = "UPDATE pet_medication SET given = true, time_of_dose = ? WHERE med_id = ? AND pet_id = ?";
+            LocalDateTime currentTime = LocalDateTime.now();
+            Timestamp timestamp = Timestamp.valueOf(currentTime);
+
             try {
-                jdbcTemplate.update(updateSql, medId, petId);
+                jdbcTemplate.update(updateSql, timestamp, medId, petId);
             } catch (CannotGetJdbcConnectionException e) {
                 throw new DaoException("Unable to connect to server or database", e);
             } catch (DataIntegrityViolationException e) {
@@ -185,6 +192,7 @@ public class JdbcMedicationDao implements MedicationDao{
         }
     }
 
+    // Include an "undo" method that will allow you to reset whether the med was given.
 
 
     private Medication mapRowToMedication(SqlRowSet rs) {
